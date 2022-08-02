@@ -1,17 +1,16 @@
-let toDoFormDOM = document.querySelector("#toDoListForm")
-let olList = document.querySelector("#listToDo")
-let alert = document.querySelector("#alert")
-let works
-let listID
+let toDoFormDOM = document.querySelector("#toDoListForm");
+let olList = document.querySelector("#listToDo");
+let alert = document.querySelector("#alert");
+let works;
+let listID;
 
-
-toDoFormDOM.addEventListener("submit", submitHandler)
+toDoFormDOM.addEventListener("submit", submitHandler);
 
 class Work {
     constructor(workName, workDetail, workNumber) {
-        this.workName = workName
-        this.workDetail = workDetail
-        this.workNumber = workNumber
+        this.workName = workName;
+        this.workDetail = workDetail;
+        this.workNumber = workNumber;
     }
 }
 
@@ -21,30 +20,31 @@ let alertFunction = (title, message, className = "warning") => {
             <strong> ${title}!  </strong>${message}
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
-    `
-}
-//
+    `;
+};
+
 function submitHandler(event) {
     event.preventDefault();
     let workName = document.querySelector("#inputWorkName");
-    let workDetail = document.querySelector("#inputWorkDetail")
+    let workDetail = document.querySelector("#inputWorkDetail");
     let workNumber = document.querySelector("#inputWorkNumber");
 
     if (workName.value && workName && workDetail) {
         //addList(workName.value, workDetail.value, workNumber.value)
 
         //localStorage add.
-        let work = new Work(workName.value, workDetail.value, workNumber.value)
-        setLocal(work)
+        let work = new Work(workName.value, workDetail.value, workNumber.value);
+        setLocal(work);
         //localStorage add.
-        reloadPage()
+        reloadPage();
 
         //workName.value = workNumber.value = workDetail.value = "";
+    } else {
+        alert.innerHTML = alertFunction(
+            "Bilgilendirme",
+            "Eksik bilgi girişi yapıldığından görev eklenmedi."
+        );
     }
-    else {
-        alert.innerHTML = alertFunction("Bilgilendirme", "Eksik bilgi girişi yapıldığından görev eklenmedi.")
-    }
-
 }
 
 /*
@@ -62,99 +62,178 @@ function addList(workName, workDetail, workNumber) {
 }
 */
 
-//LocalStorage'tan works dizisini ceker ve diziyi return eder. 
+//LocalStorage'tan works dizisini ceker ve diziyi return eder.
 function getLocal() {
-    works = localStorage.getItem("workInfo")
-    works = JSON.parse(works)
-    return works
+    works = localStorage.getItem("workInfo");
+    works = JSON.parse(works);
+    return works;
 }
 
 function setLocal(work) {
-    works = works || [];  //!diziye ilk defa eklenecekse once diziyi tanimlar
-    works.push(work)
-    localStorage.setItem("workInfo", JSON.stringify(works))
+    works = works || []; //!diziye ilk defa eklenecekse once diziyi tanimlar
+    works.push(work);
+    localStorage.setItem("workInfo", JSON.stringify(works));
 }
+
+
+{/* 
+
+<div class="container">
+            <div class="row">
+              <div class="col-11">
+                <li onclick="getID(this.id)" id="li${index}"
+                  class="list-group-item d-flex justify-content-between align-items-start">
+                  <div class="ms-2 me-auto">
+                    <div class="fw-bold">00</div>
+                    11
+                  </div>
+                  <div class="mt-1">
+                    <span class="badge bg-primary rounded-pill">aa</span>
+                  </div>
+                </li>
+
+              </div>
+              <div class="col-1 m-auto">
+                <button onclick="getButtonID(this.id)" id="button-${index}" type="button" class="btn btn-danger">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x"
+                    viewBox="0 0 16 16">
+                    <path
+                      d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z">
+                    </path>
+                  </svg>
+                </button>
+
+              </div>
+            </div>
+          </div>
+        
+        
+*/}
 
 
 // Htmldeki gorev listesine, localStorage' tan aldigi works dizisinin icerigini kaydeder.
 function fillTheList() {
-    let works = getLocal()
+    let works = getLocal();
     try {
         works.forEach((element, index) => {
-            let li = document.createElement("li")
-            li.innerHTML = `<li onclick="getID(this.id)" id="li${index}"
+            let li = document.createElement("li");
+            li.innerHTML = `
+            <li onclick="getID(this.id)" id="li${index}"
                 class="list-group-item d-flex justify-content-between align-items-start">
                 <div class="ms-2 me-auto">
                     <div class="fw-bold"> ${element.workName} </div>
                     ${element.workDetail}
         </div>
-        <span class="badge bg-primary rounded-pill">${element.workNumber}</span>    
-        </li>`
-            olList.append(li)
+        <div class="mt-1">
+              <span class="badge bg-primary rounded-pill">${element.workNumber}</span>    
+                <button onclick="getButtonID(this.id)" id="button-${index}" type="button" class="btn btn-danger">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x" viewBox="0 0 16 16">
+                    <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"></path>
+                  </svg>
+                </button>
+              </div>
+        </li>`;
+            olList.append(li);
         });
     } catch (error) {
         console.log(`Daha once listeye is eklenmedi. 
-        Error: ${error}`)
+        Error: ${error}`);
     }
-    paintBoxes()
+    paintBoxes();
+}
+
+let getButtonID = (buttonID) => removeWork(buttonID);
+
+function removeWork(buttonID) {
+    let array = buttonID.split("-");
+    let workIndex = array[1];
+    buttonID = `li${workIndex}`;
+    let element = document.querySelector(`#${buttonID}`);
+    let elementHTML = element.innerHTML;
+    let works = getLocal();
+    console.log(works);
+    let isAvilable = false;
+    let index = -1;
+    works.forEach((element, itemNo) => {
+        if (!isAvilable) {
+            isAvilable = elementHTML.includes(element.workName);
+            index = itemNo;
+        }
+    });
+    console.log(index);
+
+    if (index > -1) {
+        works.splice(index, 1);
+    }
+    //set local
+    localStorage.setItem("workInfo", JSON.stringify(works));
+
+    //! Element silmeden önce elemente ait olan class silinmesi gerekebilir.
+    //! completeLi.classList.remove("bg-success", "text-decoration-line-through")
+    element.parentElement.removeChild(element);
 }
 
 function getIDLocal() {
-    listID = localStorage.getItem("listID")
-    listID = JSON.parse(listID)
-    return listID
+    listID = localStorage.getItem("listID");
+    listID = JSON.parse(listID);
+    return listID;
 }
 
 function setIDLocal(elementID) {
-    listID = listID || []
-    listID.push(elementID)
-    localStorage.setItem("listID", JSON.stringify(listID))
+    listID = listID || [];
+    listID.push(elementID);
+    localStorage.setItem("listID", JSON.stringify(listID));
 }
 
 function paintBoxes() {
-    let listID = getIDLocal()
+    let listID = getIDLocal();
 
     try {
-        listID.forEach(id => {
-            completedWork(id)
-        })
+        listID.forEach((id) => {
+            completedWork(id);
+        });
     } catch (error) {
         console.log(`Daha once is tamamlanmadi. 
-        Error: ${error}`)
-    }
-    finally {
-        console.log("Boyama islemi adimi gecildi.")
+        Error: ${error}`);
+    } finally {
+        console.log("Boyama islemi adimi gecildi.");
     }
 }
 
 // Yapilan islerin bitirilme durumu
 let getID = (elementID) => {
-    listID = getIDLocal()
+    listID = getIDLocal();
 
     if (listID != null && listID.includes(elementID)) {
-        unCompletedWork(elementID)
+        unCompletedWork(elementID);
     } else {
-        setIDLocal(elementID)
-        completedWork(elementID)
+        setIDLocal(elementID);
+        completedWork(elementID);
     }
-}
-
+};
 
 function completedWork(elementID) {
-    let completeLi = document.querySelector(`#${elementID}`)
-    completeLi.classList.add("bg-success", "text-decoration-line-through")
+    let completeLi = document.querySelector(`#${elementID}`);
+    try {
+        completeLi.classList.add("bg-success", "text-decoration-line-through");
+    } catch (error) {
+        console.log("Error : ", error);
+    }
 }
 
 function unCompletedWork(elementID) {
-    let index = listID.indexOf(elementID)
-    if (index > -1) { 
-        listID.splice(index, 1); 
+    let index = listID.indexOf(elementID);
+    if (index > -1) {
+        listID.splice(index, 1);
     }
-    localStorage.setItem("listID", JSON.stringify(listID))
-    let completeLi = document.querySelector(`#${elementID}`)
-    completeLi.classList.remove("bg-success", "text-decoration-line-through")
+    localStorage.setItem("listID", JSON.stringify(listID));
+    let completeLi = document.querySelector(`#${elementID}`);
+    try {
+        completeLi.classList.remove("bg-success", "text-decoration-line-through");
+    } catch (error) {
+        console.log("Error : ", error);
+    }
 }
 
 //sayfadaki degisiklerin guncellenmesi
-let reloadPage = () => window.location.reload()
-
+let reloadPage = () => window.location.reload();
