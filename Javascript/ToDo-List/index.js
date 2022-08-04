@@ -30,15 +30,11 @@ function submitHandler(event) {
     let workNumber = document.querySelector("#inputWorkNumber");
 
     if (workName.value && workName && workDetail) {
-        //addList(workName.value, workDetail.value, workNumber.value)
-
         //localStorage add.
         let work = new Work(workName.value, workDetail.value, workNumber.value);
         setLocal(work);
         //localStorage add.
         reloadPage();
-
-        //workName.value = workNumber.value = workDetail.value = "";
     } else {
         alert.innerHTML = alertFunction(
             "Bilgilendirme",
@@ -46,21 +42,6 @@ function submitHandler(event) {
         );
     }
 }
-
-/*
-function addList(workName, workDetail, workNumber) {
-    let li = document.createElement("li")
-    li.innerHTML = `<li onclick="getID(this.id)" id=li${index}"
-    class="list-group-item d-flex justify-content-between align-items-start">
-    <div class="ms-2 me-auto">
-      <div class="fw-bold"> ${workName} </div>
-      ${workDetail}
-    </div>
-    <span class="badge bg-primary rounded-pill">${workNumber}</span>
-    </li>`
-    olList.append(li)
-}
-*/
 
 //LocalStorage'tan works dizisini ceker ve diziyi return eder.
 function getLocal() {
@@ -75,20 +56,24 @@ function setLocal(work) {
     localStorage.setItem("workInfo", JSON.stringify(works));
 }
 
-
-{/* 
-
-<div class="container">
+// Htmldeki gorev listesine, localStorage' tan aldigi works dizisinin icerigini kaydeder.
+function fillTheList() {
+    let works = getLocal();
+    try {
+        works.forEach((element, index) => {
+            let li = document.createElement("li");
+            li.innerHTML = `
+            <div class="container">
             <div class="row">
               <div class="col-11">
                 <li onclick="getID(this.id)" id="li${index}"
                   class="list-group-item d-flex justify-content-between align-items-start">
                   <div class="ms-2 me-auto">
-                    <div class="fw-bold">00</div>
-                    11
+                    <div class="fw-bold">${element.workName}</div>
+                    ${element.workDetail}
                   </div>
                   <div class="mt-1">
-                    <span class="badge bg-primary rounded-pill">aa</span>
+                    <span class="badge bg-primary rounded-pill">${element.workNumber}</span>
                   </div>
                 </li>
 
@@ -105,19 +90,11 @@ function setLocal(work) {
 
               </div>
             </div>
-          </div>
+          </div>            
+`
+            {/**
         
-        
-*/}
-
-
-// Htmldeki gorev listesine, localStorage' tan aldigi works dizisinin icerigini kaydeder.
-function fillTheList() {
-    let works = getLocal();
-    try {
-        works.forEach((element, index) => {
-            let li = document.createElement("li");
-            li.innerHTML = `
+            `
             <li onclick="getID(this.id)" id="li${index}"
                 class="list-group-item d-flex justify-content-between align-items-start">
                 <div class="ms-2 me-auto">
@@ -133,6 +110,7 @@ function fillTheList() {
                 </button>
               </div>
         </li>`;
+        */}
             olList.append(li);
         });
     } catch (error) {
@@ -145,10 +123,11 @@ function fillTheList() {
 let getButtonID = (buttonID) => removeWork(buttonID);
 
 function removeWork(buttonID) {
+    
     let array = buttonID.split("-");
     let workIndex = array[1];
-    buttonID = `li${workIndex}`;
-    let element = document.querySelector(`#${buttonID}`);
+    letLiID = `li${workIndex}`;
+    let element = document.querySelector(`#${letLiID}`);
     let elementHTML = element.innerHTML;
     let works = getLocal();
     console.log(works);
@@ -167,9 +146,10 @@ function removeWork(buttonID) {
     }
     //set local
     localStorage.setItem("workInfo", JSON.stringify(works));
-
-    //! Element silmeden önce elemente ait olan class silinmesi gerekebilir.
-    //! completeLi.classList.remove("bg-success", "text-decoration-line-through")
+    
+    //! ListId deki boyanan degerler de guncellenmeli
+    let buttonElement = document.querySelector(`#${buttonID}`);
+    buttonElement.parentElement.removeChild(buttonElement)
     element.parentElement.removeChild(element);
 }
 
@@ -212,6 +192,7 @@ let getID = (elementID) => {
     }
 };
 
+// tamamlanmis isler icin renk ve text decoration class larinin kaldirilmesi
 function completedWork(elementID) {
     let completeLi = document.querySelector(`#${elementID}`);
     try {
@@ -221,6 +202,7 @@ function completedWork(elementID) {
     }
 }
 
+// tamamlanmamis isler icin renk ve text decoration class larinin kaldirilmesi
 function unCompletedWork(elementID) {
     let index = listID.indexOf(elementID);
     if (index > -1) {
