@@ -23,12 +23,16 @@ Array.prototype.forEach.call(document.querySelectorAll('.liElement'), function (
     });
 });
 
-
 class Work {
+    workID;
     constructor(workName, workDetail, workNumber) {
         this.workName = workName;
         this.workDetail = workDetail;
         this.workNumber = workNumber;
+        this.workID=0;
+    }
+    name() {
+        console.log("selam")
     }
 }
 
@@ -75,6 +79,10 @@ function getLocal() {
 
 function setLocal(work) {
     works = works || []; //!diziye ilk defa eklenecekse once diziyi tanimlar
+    let worksLength = works.length
+    if (worksLength!=0) {
+        work.workID = works[worksLength-1].workID + 1;
+    }
     works.push(work);
     localStorage.setItem("workInfo", JSON.stringify(works));
 }
@@ -83,13 +91,13 @@ function setLocal(work) {
 function fillTheList() {
     let works = getLocal();
     try {
-        works.forEach((element, index) => {
+        works.forEach(element => {
             let li = document.createElement("li");
             li.innerHTML = ` 
             <div class="container">
             <div class="row">
               <div class="col-11">
-                <li id="li${index}" class="liElement list-group-item d-flex justify-content-between align-items-start">
+                <li id="li${element.workID}" class="liElement list-group-item d-flex justify-content-between align-items-start">
                   <div class="ms-2 me-auto">
                     <div class="fw-bold">${element.workName}</div>
                     ${element.workDetail}
@@ -100,7 +108,7 @@ function fillTheList() {
                 </li>
               </div>
               <div class="col-1 m-auto">
-                <button id="button-${index}" type="button" class="button btn btn-danger">
+                <button id="button-${element.workID}" type="button" class="button btn btn-danger">
                   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x"
                     viewBox="0 0 16 16">
                     <path
@@ -124,10 +132,10 @@ function fillTheList() {
 function removeWork(buttonID) {
     
     let array = buttonID.split("-");
-    let workIndex = array[1];
+    let workIndex = array[1]; //workIndex bizim gercek workID miz
     let liID = `li${workIndex}`;
     let element = document.querySelector(`#${liID}`);
-    let elementHTML = element.innerHTML;
+    let elementHTML = element.innerHTML; //
     let works = getLocal();
     let isAvilable = false;
     let index = -1;
