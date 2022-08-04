@@ -24,7 +24,23 @@ Array.prototype.forEach.call(
     document.querySelectorAll(".liElement"),
     function (el) {
         el.addEventListener("click", function () {
-            getID(this.id);
+            let liID = this.id;
+            console.log("li:", liID)
+            let divID = liID.slice(2)
+            console.log("burdayım", divID)
+            let element = document.querySelector(`#div-${divID[0]}`)
+            element.classList.add("loader")
+            setTimeout(() => {
+                console.log("yukleniyor")
+                element.classList.remove("loader")
+                getID(this.id);
+            }, 400);
+
+
+
+
+
+
         });
     }
 );
@@ -101,30 +117,37 @@ function fillTheList() {
             let li = document.createElement("li");
             li.innerHTML = ` 
             <div class="container">
-            <div class="row">
-              <div class="col-11">
-                <li id="li${element.workID}" class="liElement list-group-item d-flex justify-content-between align-items-start">
-                  <div class="ms-2 me-auto">
-                    <div class="fw-bold">${element.workName}</div>
-                    ${element.workDetail}
+                  <div class="row">
+                    <div class="col-10">
+                      <li id="li${element.workID}" class="liElement list-group-item d-flex justify-content-between align-items-start">
+                        <div class="ms-2 me-auto">
+                          <div class="fw-bold">${element.workName}</div>
+                          ${element.workDetail}
+                        </div>
+                        <div class="mt-1">
+                          <span class="badge bg-primary rounded-pill">${element.workNumber}</span>
+                        </div>
+                      </li>
+                    </div>
+                    <div class="col-2 m-auto">
+                        <div class="row">
+                            <div class="col-sm">
+                                <button id="button-${element.workID}" type="button" class="button btn btn-danger">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x"
+                                      viewBox="0 0 16 16">
+                                      <path
+                                        d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z">
+                                      </path>
+                                    </svg>
+                                  </button>
+                            </div>
+                            <div class="col-sm">
+                                <div id="div-${element.workID}"></div>
+                            </div>
+                        </div>
+                    </div>
                   </div>
-                  <div class="mt-1">
-                    <span class="badge bg-primary rounded-pill">${element.workNumber}</span>
-                  </div>
-                </li>
-              </div>
-              <div class="col-1 m-auto">
-                <button id="button-${element.workID}" type="button" class="button btn btn-danger">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x"
-                    viewBox="0 0 16 16">
-                    <path
-                      d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z">
-                    </path>
-                  </svg>
-                </button>
-              </div>
-            </div>
-          </div>
+                </div>        
 `;
             olList.append(li);
         });
