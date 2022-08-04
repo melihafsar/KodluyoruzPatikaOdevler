@@ -1,38 +1,42 @@
 let toDoFormDOM = document.querySelector("#toDoListForm");
 let olList = document.querySelector("#listToDo");
 let alert = document.querySelector("#alert");
+
+//Eklenen islerin ve boyanan islerin bilgisini tutan diziler
 let works;
 let listID;
 
 //calisarak sayfa yuklendigi gibi localStorage taki isleri sayfaya doldurur.
-fillTheList()
+fillTheList();
 
-//eklenen isler sayfaya doldurulduktan sonra class tanimlamalarinda "button" isminde olanlari dinler. Tiklanirsa id degerini dondurur. 
-Array.prototype.forEach.call(document.querySelectorAll('.button'), function (el) {
-    el.addEventListener('click', function () {
-        console.log("10.satir",this.id)
-        removeWork(this.id)
-    });
-});
+//eklenen isler sayfaya doldurulduktan sonra class tanimlamalarinda "button" isminde olanlari dinler. Tiklanirsa id degerini dondurur.
+Array.prototype.forEach.call(
+    document.querySelectorAll(".button"),
+    function (el) {
+        el.addEventListener("click", function () {
+            removeWork(this.id);
+        });
+    }
+);
 
-//eklenen isler sayfaya doldurulduktan sonra class tanimlamalarinda "liElement" isminde olanlari dinler. Tiklanirsa id degerini dondurur. 
-Array.prototype.forEach.call(document.querySelectorAll('.liElement'), function (el) {
-    el.addEventListener('click', function () {
-        console.log("10.satir",this.id)
-        getID(this.id)
-    });
-});
+//eklenen isler sayfaya doldurulduktan sonra class tanimlamalarinda "liElement" isminde olanlari dinler. Tiklanirsa id degerini dondurur.
+Array.prototype.forEach.call(
+    document.querySelectorAll(".liElement"),
+    function (el) {
+        el.addEventListener("click", function () {
+            getID(this.id);
+        });
+    }
+);
 
+//Is bilgi class
 class Work {
     workID;
     constructor(workName, workDetail, workNumber) {
         this.workName = workName;
         this.workDetail = workDetail;
         this.workNumber = workNumber;
-        this.workID=0;
-    }
-    name() {
-        console.log("selam")
+        this.workID = 0;
     }
 }
 
@@ -57,10 +61,11 @@ function submitHandler(event) {
     let workNumber = document.querySelector("#inputWorkNumber");
 
     if (workName.value && workName && workDetail) {
-        //localStorage add.
+        //is olusturulur.
         let work = new Work(workName.value, workDetail.value, workNumber.value);
+        //localStorage'a is eklenir.
         setLocal(work);
-        //localStorage add.
+
         reloadPage();
     } else {
         alert.innerHTML = alertFunction(
@@ -77,21 +82,22 @@ function getLocal() {
     return works;
 }
 
+//is nesnesini parametre olarak alir ve localStorage a ekler.
 function setLocal(work) {
     works = works || []; //!diziye ilk defa eklenecekse once diziyi tanimlar
-    let worksLength = works.length
-    if (worksLength!=0) {
-        work.workID = works[worksLength-1].workID + 1;
+    let worksLength = works.length;
+    if (worksLength != 0) {
+        work.workID = works[worksLength - 1].workID + 1;
     }
     works.push(work);
     localStorage.setItem("workInfo", JSON.stringify(works));
 }
 
-// Htmldeki gorev listesine, localStorage' tan aldigi works dizisinin icerigini kaydeder.
+// Htmldeki gorev listesine, localStorage' tan aldigi works dizisinin icerigini dinamik olarak kaydeder.
 function fillTheList() {
     let works = getLocal();
     try {
-        works.forEach(element => {
+        works.forEach((element) => {
             let li = document.createElement("li");
             li.innerHTML = ` 
             <div class="container">
@@ -119,7 +125,7 @@ function fillTheList() {
               </div>
             </div>
           </div>
-`
+`;
             olList.append(li);
         });
     } catch (error) {
@@ -129,52 +135,43 @@ function fillTheList() {
     paintBoxes();
 }
 
+//tiklanan butonun ID degerini paremetre olarak alir ve gorevi kaldirir.
 function removeWork(buttonID) {
-    
     let array = buttonID.split("-");
-    let workIndex = array[1]; //workIndex bizim gercek workID miz
-    let liID = `li${workIndex}`;
+    let workID = array[1]; //workIndex bizim gercek workID miz
+    let liID = `li${workID}`;
     let element = document.querySelector(`#${liID}`);
-    let elementHTML = element.innerHTML; //
     let works = getLocal();
-    let isAvilable = false;
-    let index = -1;
-    works.forEach((element, itemNo) => {
-        if (!isAvilable) {
-            isAvilable = elementHTML.includes(element.workName);
-            index = itemNo;
+    let workIndex;
+    works.forEach((element, index) => {
+        if (element.workID == workID) {
+            workIndex = index;
         }
     });
 
-    if (index > -1) {
-        works.splice(index, 1);
+    if (workIndex > -1) {
+        works.splice(workIndex, 1);
     }
     //set local
     localStorage.setItem("workInfo", JSON.stringify(works));
-    
+
     //! liste kismi sorunlu
-    listID = getIDLocal()
-    console.log("liste ilk durum: ",listID)
-    console.log("butona göre li elementinin id si",liID)
-    let liIndex = -1
-    listID.forEach((element, itemNo) => {
-        if (!isAvilable) {
-            isAvilable = listID.includes(liID);
-            liIndex = itemNo;
-            console.log(liIndex)
+    listID = getIDLocal();
+
+    try {
+        let liIndex = listID.indexOf(liID);
+
+        if (liIndex > -1) {
+            listID.splice(liIndex, 1);
         }
-    });
-
-    if (liIndex > -1) {
-        listID.splice(liIndex, 1);
+        //set local
+        localStorage.setItem("listID", JSON.stringify(listID));
+    } catch (error) {
+        console.log("ERROR: boyama listesi daha önce olusturulmadi hatası");
     }
-    console.log("liste son durum: ", listID)
-    //set local
-    localStorage.setItem("listID", JSON.stringify(listID));
 
-    //! ListId deki boyanan degerler de guncellenmeli
     let buttonElement = document.querySelector(`#${buttonID}`);
-    buttonElement.parentElement.removeChild(buttonElement)
+    buttonElement.parentElement.removeChild(buttonElement);
     element.parentElement.removeChild(element);
 }
 
@@ -189,7 +186,7 @@ function setIDLocal(elementID) {
     listID.push(elementID);
     localStorage.setItem("listID", JSON.stringify(listID));
 }
-
+//tamamlanan isleri boyar.
 function paintBoxes() {
     let listID = getIDLocal();
 
