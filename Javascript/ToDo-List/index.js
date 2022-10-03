@@ -31,19 +31,35 @@ Array.prototype.forEach.call(
     function (el) {
         el.addEventListener("click", function () {
             let liID = this.id;
-            console.log("ilk ID: ",this.id)
+            //console.log("ilk ID: ",this.id)
             let divID = changeLiToWorkID(liID)
-            console.log("divID: ",this.id)
-            let element = document.querySelector(`#div-${divID}`)
-            element.classList.add("loader")
-            setTimeout(() => {
-                console.log("yukleniyor")
-                element.classList.remove("loader")
-                getID(liID);
-            }, 400);
+            //console.log("divID: ",this.id)
 
-            //Todo: completedWORK
 
+            //tamamlanmis islerin yesil boyasinin kaldirilmasi istenmiyor.Kontrolunun yapilmasi burada saglaniyor.
+            let listID = getIDLocal();
+            let isAvailable = true;
+            
+            //listId null gelme kontrolu yapilamalidir
+            if (listID != null) {
+                listID.forEach(element => {
+                    if (element == liID) {
+                        isAvailable = false;
+                        //console.log("boolean",isAvailable);
+                    }
+                })
+            }
+
+            if (!isAvailable) {
+            } else {
+                let element = document.querySelector(`#div-${divID}`)
+                element.classList.add("loader")
+                setTimeout(() => {
+                    console.log("yukleniyor")
+                    element.classList.remove("loader")
+                    getID(liID);
+                }, 400);
+            }
         });
     }
 );
@@ -109,15 +125,7 @@ function getCompletedWorksLocal() {
 //is nesnesini parametre olarak alir ve localStorage a ekler.
 function setLocal(work) {
     works = works || []; //? diziye ilk defa eklenecekse once diziyi tanimlar
-    work.workID = randomID()
-
-    // let worksLength = works.length;
-    // if (worksLength != 0) {
-    //     work.workID = works[worksLength - 1].workID + 1;
-    // }
-
-
-
+    work.workID = randomID();
     works.push(work);
     localStorage.setItem("workInfo", JSON.stringify(works));
 }
@@ -131,12 +139,6 @@ function setCompletedWorksLocal(work) {
     else {
         completedWorks.push(work);
     }
-
-    //let worksLength = works.length;
-    //if (worksLength != 0) {
-    //    work.workID = works[worksLength - 1].workID + 1;
-    //}
-    //? YORUM SATIRINA ALINMA SEBEBI: is sifirdan eklenmiyor id degismesine gerek yok
     localStorage.setItem("completedWorkInfo", JSON.stringify(completedWorks));
 }
 
@@ -207,6 +209,23 @@ let changeButtonToWorkId = (buttonID) => {
     return array[1];
 }
 
+function deleteCompletedWork(workID) {
+    let arrayComletedWork = JSON.parse(localStorage.getItem("completedWorkInfo"));
+    let result;
+    if (arrayComletedWork != null) {
+        arrayComletedWork.forEach((element, index) =>{
+            //console.log(element);
+            if(element.workID == parseInt(workID)){
+                // result = index;
+                arrayComletedWork.splice(index, 1);
+                localStorage.setItem("completedWorkInfo",JSON.stringify(arrayComletedWork))
+            }
+        });
+
+    }
+}
+
+
 //tiklanan butonun ID degerini paremetre olarak alir ve gorevi kaldirir.
 function removeWork(workID) {
     //yeri degisecek isin gecici olarak id si listeye changeWork te ekleniyor.
@@ -218,7 +237,8 @@ function removeWork(workID) {
     arrayID.splice(result,1)
     localStorage.setItem("arrayID",JSON.stringify(arrayID))
     //?
-
+    deleteCompletedWork(workID);
+    
     let liID = `li${workID}`;
     let element = document.querySelector(`#${liID}`);
     let works = getLocal();
@@ -229,7 +249,6 @@ function removeWork(workID) {
             changedWork = element
         }
     });
-
     if (workIndex > -1) {
         works.splice(workIndex, 1);
     }
@@ -237,10 +256,10 @@ function removeWork(workID) {
     localStorage.setItem("workInfo", JSON.stringify(works));
 
     listID = getIDLocal();
-
+    
     try {
         let liIndex = listID.indexOf(liID);
-
+        
         if (liIndex > -1) {
             listID.splice(liIndex, 1);
         }
@@ -249,7 +268,7 @@ function removeWork(workID) {
     } catch (error) {
         console.log("ERROR: boyama listesi daha önce olusturulmadi hatası");
     }
-
+    
     let buttonElement = document.querySelector(`#button-${workID}`);
     buttonElement.parentElement.removeChild(buttonElement);
     element.parentElement.removeChild(element);
@@ -282,13 +301,11 @@ let getID = (elementID) => {
 
 // tamamlanmis isler icin renk ve text decoration class larinin eklenmesi
 function completedWork() {
-    console.log("comletedWorkteyim")
     listID = getIDLocal()
     listID.forEach(element => {
         let completeLi = document.querySelector(`#${element}`);
         try {
             completeLi.classList.add("bg-success", "text-decoration-line-through");
-            console.log("classlar eklendi")
         } catch (error) {
             console.log("completedWork Error : ", error);
         }
